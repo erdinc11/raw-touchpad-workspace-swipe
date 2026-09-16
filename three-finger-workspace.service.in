@@ -1,0 +1,27 @@
+[Unit]
+Description=Raw three-finger touchpad workspace swipe
+After=graphical.target
+
+[Service]
+Type=simple
+User=@USER@
+SupplementaryGroups=input
+Environment=XDG_RUNTIME_DIR=/run/user/@UID@
+ExecStart=@HOME@/.local/bin/three-finger-workspace.py
+Restart=always
+RestartSec=1
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+LockPersonality=true
+RestrictSUIDSGID=true
+CapabilityBoundingSet=
+DevicePolicy=closed
+DeviceAllow=@DEVICE@ r
+
+[Install]
+WantedBy=graphical.target
