@@ -31,7 +31,7 @@ BTN_TOOL_TRIPLETAP = 334
 
 # This is deliberately small enough to trigger early, while requiring real
 # horizontal motion.  The values are in the touchpad's raw coordinate units.
-MIN_X_DELTA = 35
+MIN_X_DELTA = 15
 MAX_Y_DELTA = 260
 HORIZONTAL_DOMINANCE = 1.20
 
