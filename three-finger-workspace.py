@@ -7,6 +7,7 @@ passes the threshold, it asks Hyprland to change workspace immediately.
 """
 
 import glob
+import json
 import os
 import struct
 import subprocess
@@ -82,12 +83,51 @@ def set_tap_to_click(enabled):
         print("tap-to-click toggle unavailable or timed out", flush=True)
 
 
+def workspace_target(delta):
+    try:
+        env = hyprland_env()
+        active_result = subprocess.run(
+            ["/usr/bin/hyprctl", "-j", "activeworkspace"],
+            env=env,
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            timeout=0.5,
+            check=False,
+        )
+        workspaces_result = subprocess.run(
+            ["/usr/bin/hyprctl", "-j", "workspaces"],
+            env=env,
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            timeout=0.5,
+            check=False,
+        )
+        active = json.loads(active_result.stdout)
+        workspaces = json.loads(workspaces_result.stdout)
+    except (json.JSONDecodeError, OSError, subprocess.TimeoutExpired):
+        # Avoid creating another workspace if state cannot be read safely.
+        return "e+1" if delta < 0 else "r-1"
+
+    if delta < 0:
+        # Never create a second empty workspace while already on an empty one.
+        if active.get("windows", 0) == 0:
+            return None
+        has_empty = any(workspace.get("windows", 0) == 0 for workspace in workspaces)
+        return "e+1" if has_empty else "r+1"
+
+    # Moving right never needs to create a workspace.
+    return "r-1"
+
+
 def change_workspace(delta):
     # With Hyprland's usual swipe direction, moving fingers left means next
     # workspace and moving fingers right means previous workspace.
-    # `r` walks workspace IDs including empty workspaces.  `e` would wrap
-    # from the last existing workspace back to the first one.
-    target = "r+1" if delta < 0 else "r-1"
+    target = workspace_target(delta)
+    if target is None:
+        print("raw 3f swipe ignored: already on an empty workspace", flush=True)
+        return
     try:
         result = subprocess.run(
             [

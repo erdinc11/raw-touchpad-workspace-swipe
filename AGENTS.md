@@ -30,6 +30,8 @@ test both swipe directions and one/two-finger tap-to-click.
 
 - A leftward three-finger swipe selects `r+1`.
 - A rightward three-finger swipe selects `r-1`.
+- At most one empty workspace may be created; left swipes from an empty
+  workspace must be ignored.
 - The gesture should trigger once per contact sequence.
 - A transient one-slot report from Synaptics hardware must not cancel an
   otherwise valid three-finger gesture.

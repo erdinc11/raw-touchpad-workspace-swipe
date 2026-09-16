@@ -14,7 +14,7 @@ horizontal movement is detected.
 - Fast three-finger horizontal workspace switching.
 - Supports Synaptics devices that expose two MT slots plus
   `BTN_TOOL_TRIPLETAP`.
-- Includes empty workspaces using `r+1` and `r-1` selectors.
+- Creates at most one empty workspace and reuses it for forward swipes.
 - Does not require Python packages.
 - Leaves normal one- and two-finger tap-to-click enabled.
 - Temporarily disables tap-to-click during a three-finger contact, preventing
@@ -58,6 +58,10 @@ The default mapping is:
 
 - Fingers moving left: next workspace (`r+1`)
 - Fingers moving right: previous workspace (`r-1`)
+
+When moving left from a non-empty workspace, an existing empty workspace is
+reused. If none exists, one is created. Moving left while already on an empty
+workspace is ignored, so repeated swipes cannot create more empty workspaces.
 
 ## Development checks
 
