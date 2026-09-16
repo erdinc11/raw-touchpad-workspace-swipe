@@ -61,10 +61,7 @@ def hyprland_env():
 
 def set_tap_to_click(enabled):
     value = "true" if enabled else "false"
-    code = (
-        "hl.config({ input = { touchpad = { tap_to_click = "
-        f"{value} }} }})"
-    )
+    code = f"hl.config({{ input = {{ touchpad = {{ tap_to_click = {value} }} }} }})"
     try:
         result = subprocess.run(
             ["/usr/bin/hyprctl", "eval", code],
