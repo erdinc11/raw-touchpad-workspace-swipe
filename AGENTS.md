@@ -11,6 +11,8 @@ installer for three-finger touchpad workspace swipes.
 - Keep the runtime dependency-free unless there is a strong reason to add a
   package dependency.
 - Preserve normal pointer movement, scrolling, and one/two-finger tap-to-click.
+- Keep tap-to-click disabled only for the lifetime of a three-finger contact;
+  restore it after release.
 - Do not grab the touchpad unless the design also preserves all normal pointer
   behavior.
 - Keep raw-device access read-only and limited to the detected touchpad node.
@@ -31,4 +33,3 @@ test both swipe directions and one/two-finger tap-to-click.
 - The gesture should trigger once per contact sequence.
 - A transient one-slot report from Synaptics hardware must not cancel an
   otherwise valid three-finger gesture.
-

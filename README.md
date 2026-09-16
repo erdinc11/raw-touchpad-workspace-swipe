@@ -17,7 +17,8 @@ horizontal movement is detected.
 - Includes empty workspaces using `r+1` and `r-1` selectors.
 - Does not require Python packages.
 - Leaves normal one- and two-finger tap-to-click enabled.
-- Filters the middle-button event commonly produced by a three-finger tap.
+- Temporarily disables tap-to-click during a three-finger contact, preventing
+  a swipe release from clicking the underlying window.
 
 ## Install
 

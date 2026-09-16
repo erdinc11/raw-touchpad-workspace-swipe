@@ -59,6 +59,32 @@ def hyprland_env():
     return env
 
 
+def set_tap_to_click(enabled):
+    value = "true" if enabled else "false"
+    code = (
+        "hl.config({ input = { touchpad = { tap_to_click = "
+        f"{value} }} }})"
+    )
+    try:
+        result = subprocess.run(
+            ["/usr/bin/hyprctl", "eval", code],
+            env=hyprland_env(),
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            timeout=0.5,
+            check=False,
+        )
+        if result.returncode != 0:
+            print(
+                f"tap-to-click toggle failed rc={result.returncode} "
+                f"out={result.stdout.strip()!r}",
+                flush=True,
+            )
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        print("tap-to-click toggle unavailable or timed out", flush=True)
+
+
 def change_workspace(delta):
     # With Hyprland's usual swipe direction, moving fingers left means next
     # workspace and moving fingers right means previous workspace.
@@ -99,6 +125,10 @@ def run():
     direction_sign = 0
     direction_steps = 0
     tripletap = False
+    tap_suppressed = False
+
+    # Restore the normal state after a service restart during a touch.
+    set_tap_to_click(True)
 
     while True:
         device = find_device()
@@ -135,6 +165,9 @@ def run():
                     elif event_type == EV_KEY and code == BTN_TOOL_TRIPLETAP:
                         tripletap = value > 0
                         if tripletap:
+                            if not tap_suppressed:
+                                set_tap_to_click(False)
+                                tap_suppressed = True
                             print("raw 3f contact", flush=True)
 
                     if event_type != EV_SYN or code != SYN_REPORT:
@@ -149,6 +182,9 @@ def run():
 
                     finger_count = 3 if tripletap else len(active)
                     if not tripletap and finger_count == 0:
+                        if tap_suppressed:
+                            set_tap_to_click(True)
+                            tap_suppressed = False
                         sequence_started = False
                         sequence_finished = False
                         triggered = False
